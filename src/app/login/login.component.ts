@@ -32,14 +32,13 @@ export class LoginComponent {
     let promisedToken = this.bearerAuth.getTokenFromServer(currentUser);
     promisedToken
       .then((token: string) => {
-        debugger;
         if (token == null)
           console.log('something went wrong');
         else {
           this.currentUser = currentUser;
           this.currentUser.token = token;
           this.bearerAuth.saveCurrentUserToStorage(this.currentUser);
-          this.router.navigate(['/logged']);
+          this.router.navigate(['/people']);
         }
       });
   }

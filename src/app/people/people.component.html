@@ -1,0 +1,17 @@
+<div class="col-md-6 col-sm-12 inner">
+  <h3>People</h3>
+  <table class="table table-hover" *ngIf="people">
+    <thead>
+      <tr>
+        <th scope="col">First</th>
+        <th scope="col">Last</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let person of people">
+        <td>{{person.firstName}} </td>
+        <td>{{person.lastName}} </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

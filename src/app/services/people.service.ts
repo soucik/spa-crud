@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Http, HttpModule, RequestOptionsArgs } from '@angular/http';
-import { ICurrentUser } from '../common/interfaces';
+import { Http, HttpModule, Headers, RequestOptionsArgs, RequestOptions } from '@angular/http';
+
+import { ICurrentUser, IPerson } from '../common/interfaces';
 
 @Injectable()
-export class BearerAuthService {
+export class PeopleService {
 
   private urlBase: string = 'http://sampleaspnetcorewebapi.azurewebsites.net';
+  private commonHeader: any;
   private userRequest: RequestOptionsArgs = new Object();
 
   constructor(private http: Http) {
-
+    this.commonHeader = { headers: new Headers({ 'Access-Control-Allow-Origin': '*' }) };
   }
 
   getTokenFromServer(currentUser): Promise<string> {
@@ -19,11 +21,10 @@ export class BearerAuthService {
       .then(response => {
         let token = response.text();
         token = token.substr(1, token.length - 2);
-        if (typeof token == "string") {
+        if (typeof token == "string")
           return token;
-        } else {
+        else
           return null;
-        }
       })
       .catch(error => { return null });
   }
@@ -40,5 +41,14 @@ export class BearerAuthService {
 
   getCurrentUserFromStorage(): ICurrentUser {
     return JSON.parse(localStorage.getItem('currentUser'));
+  }
+
+  getPeopleFromServer(token: string): Promise<IPerson[]> {
+    let header = new Headers();
+    header.append('Authorization', 'Bearer ' + token);
+    let options: RequestOptionsArgs = { headers: header }
+
+    let promisedPeople = this.http.get(this.urlBase + '/api/people', options).toPromise();
+    return promisedPeople.then((response) => <IPerson[]>response.json());
   }
 }
