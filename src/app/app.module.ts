@@ -8,6 +8,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { PeopleComponent } from './people/people.component';
+import { PeopleDetailComponent } from './people-detail/people-detail.component';
 import { BearerAuthService } from './services/bearer-auth.service';
 import { PeopleService } from './services/people.service';
 
@@ -15,7 +16,8 @@ import { PeopleService } from './services/people.service';
   declarations: [
     AppComponent,
     LoginComponent,
-    PeopleComponent
+    PeopleComponent,
+    PeopleDetailComponent
   ],
   imports: [
     BrowserModule,

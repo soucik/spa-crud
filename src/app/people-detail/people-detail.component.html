@@ -1,0 +1,18 @@
+<h3>Person Details</h3>
+<h4>{{ person.firstName | uppercase }} {{ person.lastName | uppercase }}</h4>
+<table class="table">
+  <tr class="row">
+    <th class="col-md-3">First Name: </th>
+    <td class="col-md-9">{{person.firstName}}</td>
+  </tr>
+  <tr class="row">
+    <th class="col-md-3">Last Name: </th>
+    <td class="col-md-9">{{person.lastName}}</td>
+  </tr>
+  <tr class="row">
+    <th class="col-md-3">Email: </th>
+    <td class="col-md-9">{{person.email}}</td>
+  </tr>
+</table>
+<button type="button" class="btn btn-primary">Update</button>
+<button type="button" class="btn btn-danger">Detele</button>

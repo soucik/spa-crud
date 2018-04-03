@@ -1,13 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~bootstrap/dist/css/bootstrap.min.css';
 
+#base{
+    background: url('assets/images/bgBaranec.jpg') top no-repeat;
+}
+
 body, #base{
     background-size: cover;
     background-attachment: local;
     background-color: darkgoldenrod;
 }
 
-h3{
+h3, h4{
     text-align: center;
 }
 
@@ -28,4 +32,12 @@ h3{
     background-color: rgba(51, 91, 150, 0.80);
     color: white;
     box-shadow: 10px 10px 5px rgba(6, 1, 1, 0.43);
+}
+
+.innerSide{
+    background-color:rgba(49, 51, 56, 0.80);
+}
+
+.table-hover>tbody>tr:hover {
+    background-color:rgba(49, 51, 56, 0.70);
 }
