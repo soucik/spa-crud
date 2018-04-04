@@ -1,18 +1,26 @@
 <h3>Person Details</h3>
 <h4>{{ person.firstName | uppercase }} {{ person.lastName | uppercase }}</h4>
-<table class="table">
-  <tr class="row">
-    <th class="col-md-3">First Name: </th>
-    <td class="col-md-9">{{person.firstName}}</td>
-  </tr>
-  <tr class="row">
-    <th class="col-md-3">Last Name: </th>
-    <td class="col-md-9">{{person.lastName}}</td>
-  </tr>
-  <tr class="row">
-    <th class="col-md-3">Email: </th>
-    <td class="col-md-9">{{person.email}}</td>
-  </tr>
-</table>
-<button type="button" class="btn btn-primary">Update</button>
-<button type="button" class="btn btn-danger">Detele</button>
+<form [formGroup]="updateForm" (ngSubmit)="onUpdatePerson(person.id, updateForm.value)" role="form">
+  <div class="form-group">
+    <label>First Name:
+      <span style="display:block" *ngIf="!editStateForm">{{person.firstName}}</span>
+      <input [(ngModel)]="personDuplicate.firstName" *ngIf="editStateForm" type="text" class="form-control" id="firstName" formControlName="firstName">
+    </label>
+  </div>
+  <div class="form-group">
+    <label>Last Name:
+      <span style="display:block" *ngIf="!editStateForm">{{person.lastName}}</span>
+      <input [(ngModel)]="personDuplicate.lastName" *ngIf="editStateForm" type="text" class="form-control" id="lastName" formControlName="lastName">
+    </label>
+  </div>
+  <div class="form-group">
+    <label>Email:
+      <span style="display:block" *ngIf="!editStateForm">{{person.email}}</span>
+      <input [(ngModel)]="personDuplicate.email" *ngIf="editStateForm" class="form-control" id="email" formControlName="email">
+    </label>
+  </div>
+
+  <button type="button" class="btn btn-primary" *ngIf="!editStateForm" (click)="editStateForm=!editStateForm">Edit</button>
+  <button type="submit" class="btn btn-primary" *ngIf="editStateForm" [disabled]="updateForm.invalid">Update</button>
+  <button type="button" class="btn btn-danger">Detele</button>
+</form>

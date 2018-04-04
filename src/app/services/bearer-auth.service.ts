@@ -5,7 +5,7 @@ import { ICurrentUser } from '../common/interfaces';
 @Injectable()
 export class BearerAuthService {
 
-  private urlBase: string = 'http://sampleaspnetcorewebapi.azurewebsites.net';
+  private urlBase = 'http://sampleaspnetcorewebapi.azurewebsites.net';
   private userRequest: RequestOptionsArgs = new Object();
 
   constructor(private http: Http) {
@@ -19,7 +19,7 @@ export class BearerAuthService {
       .then(response => {
         let token = response.text();
         token = token.substr(1, token.length - 2);
-        if (typeof token == "string") {
+        if (typeof token === 'string') {
           return token;
         } else {
           return null;
@@ -32,8 +32,7 @@ export class BearerAuthService {
     try {
       localStorage.setItem('currentUser', JSON.stringify({ 'email': currentUser.email, 'token': currentUser.token }));
       return true;
-    }
-    catch{
+    } catch {
       return false;
     }
   }

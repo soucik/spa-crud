@@ -37,4 +37,8 @@ export class PeopleComponent implements OnInit {
   onSelect(person: IPerson): void {
     this.selectedPerson = person;
   }
+
+  childChangedPerson(personIdChanged: number) {
+    this.loadPeople(this.currentUser.token); // TODO: success of loading should be handled
+  }
 }

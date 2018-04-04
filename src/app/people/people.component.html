@@ -16,5 +16,6 @@
   </table>
 </div>
 <div class="col-sm-8 col-xs-12 inner innerSide" *ngIf="selectedPerson">
-  <app-people-detail [person]="selectedPerson"></app-people-detail>
+  <app-people-detail [person]="selectedPerson"
+  (personChanged)="childChangedPerson($event)"></app-people-detail>
 </div>

@@ -32,9 +32,9 @@ export class LoginComponent {
     let promisedToken = this.bearerAuth.getTokenFromServer(currentUser);
     promisedToken
       .then((token: string) => {
-        if (token == null)
+        if (token == null) {
           console.log('something went wrong');
-        else {
+        } else {
           this.currentUser = currentUser;
           this.currentUser.token = token;
           this.bearerAuth.saveCurrentUserToStorage(this.currentUser);
