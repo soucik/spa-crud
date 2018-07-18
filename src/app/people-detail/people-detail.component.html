@@ -22,5 +22,8 @@
 
   <button type="button" class="btn btn-primary" *ngIf="!editStateForm" (click)="editStateForm=!editStateForm">Edit</button>
   <button type="submit" class="btn btn-primary" *ngIf="editStateForm" [disabled]="updateForm.invalid">Update</button>
-  <button type="button" class="btn btn-danger">Detele</button>
+  <button type="button" class="btn btn-danger" (click)="deletePerson(person.id)">Detele</button>
+  <div id="notice" *ngIf="notice && notice.text" class="{{notice.status}}">
+    {{notice.text}}
+  </div>
 </form>

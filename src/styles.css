@@ -41,3 +41,32 @@ h3, h4{
 .table-hover>tbody>tr:hover {
     background-color:rgba(49, 51, 56, 0.70);
 }
+
+.pointCursor{
+    cursor: pointer;
+}
+
+#notice{
+    margin-top: 20px;
+    text-align: center;
+    opacity: 0.9;
+    font-size: 18px;
+}
+
+.success{
+    background-color: green;
+}
+
+.error{
+    background-color: red;
+}
+
+.warning{
+    background-color: #ff6200ab;
+}
+
+.header{
+    float: right;
+    top: 10px;
+    left: 10px;
+}

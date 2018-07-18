@@ -2,8 +2,9 @@ import { Component, Input, OnInit, OnChanges, SimpleChanges, SimpleChange, Event
 import { ReactiveFormsModule, FormGroup, FormBuilder, FormControl, Validators     } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { IPerson } from '../common/interfaces';
+import { IPerson, INotice } from '../common/interfaces';
 import { PeopleService } from '../services/people.service';
+import { ElementRef, Renderer } from '@angular/core';
 
 @Component({
   selector: 'app-people-detail',
@@ -16,10 +17,16 @@ export class PeopleDetailComponent implements OnInit, OnChanges {
   private personDuplicate: IPerson;
   private updateForm: FormGroup;
   private editStateForm: boolean;
+  private notice: INotice;
+
   @Output() personChanged = new EventEmitter<number>();
 
-  constructor(private fb: FormBuilder, private peopleService: PeopleService, private router: Router) {
-  }
+  constructor(private fb: FormBuilder, private peopleService: PeopleService, private router: Router, public el: ElementRef, public renderer: Renderer) {
+    // listen for click event on document to hide notice
+    renderer.listenGlobal('document', 'click', (event) => {
+      if(this.notice && this.notice.text) this.notice.text = "";
+    });
+ }
 
   ngOnInit() {
     this.createForm();
@@ -41,15 +48,37 @@ export class PeopleDetailComponent implements OnInit, OnChanges {
   onUpdatePerson(idPerson: number, updatedPerson: IPerson) {
     let currentUser = this.peopleService.getCurrentUserFromStorage();
     if (currentUser && currentUser.email != null && currentUser.token != null) {
-
-      let operationSuccess: boolean;
       this.peopleService.updatePerson(idPerson, updatedPerson, currentUser.token)
         .then(response => {
+          if(response.status === 200 ){
           this.person = this.personDuplicate;   // dummy way, should resolve after, within method
           this.personChanged.emit(idPerson);
           this.editStateForm = false;
-          operationSuccess = response;
+          this.notice = { text: "Update successful", status: "success"};
+        }
+        else{
+          this.notice = { text: "Something went wrong", status: "error"};
+        }
         });
     }
   }
+
+  deletePerson(idPerson: number){
+    let currentUser = this.peopleService.getCurrentUserFromStorage();
+    if (currentUser && currentUser.email != null && currentUser.token != null) {
+
+    this.peopleService.deletePerson(idPerson, currentUser.token)
+    .then(response => {
+       if(response.status === 200){
+         this.notice = { text: "Delete successful", status: "success"};
+         this.personChanged.emit(idPerson);
+       }
+       if(response.status === 403) this.notice = { text: "Forbiden", status: "warning"};
+       //...other statuses
+      })
+    .catch(error => {
+       {this.notice = { text: "Something went wrong", status: "error"} };
+    });
+  }
+}
 }

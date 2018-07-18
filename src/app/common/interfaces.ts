@@ -11,3 +11,8 @@ export interface ICurrentUser {
     id?: number;
     ownerId?: number;
   }
+
+  export interface INotice {
+    text: string;
+    status: string;
+  }

@@ -37,6 +37,16 @@ export class PeopleService {
     }
   }
 
+  destroySavedUser(currentUser: ICurrentUser): boolean {
+    try {
+      console.log('triing to logout '+ currentUser);
+      localStorage.setItem('currentUser', '');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   getCurrentUserFromStorage(): ICurrentUser {
     return JSON.parse(localStorage.getItem('currentUser'));
   }
@@ -54,14 +64,27 @@ export class PeopleService {
     return promisedPeople.then((response) => <IPerson[]>response.json());
   }
 
-  updatePerson(id: any, personToUpdate: IPerson, token: string): Promise<boolean> {
+  updatePerson(id: any, personToUpdate: IPerson, token: string): Promise<any> {
 
     let requestOptEditPerson = { headers: this.createBearerHeader(token), body: personToUpdate };
     return this.http.put(this.urlBase + '/api/people/' + id, '', requestOptEditPerson).toPromise()
-      .then(response => { return true; })
+      .then(response => { 
+        return response; 
+      })
       .catch(reject => {
-        console.log(reject);
-        return false;
+        return reject;
+      });
+  }
+
+  deletePerson(id: any, token: string): Promise<any> {
+
+    let requestOptEditPerson = { headers: this.createBearerHeader(token) };
+    return this.http.delete(this.urlBase + '/api/people/' + id,  requestOptEditPerson).toPromise()
+      .then(response => { 
+        return response; 
+      })
+      .catch(reject => {
+        return reject;
       });
   }
 }

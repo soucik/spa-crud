@@ -41,4 +41,10 @@ export class PeopleComponent implements OnInit {
   childChangedPerson(personIdChanged: number) {
     this.loadPeople(this.currentUser.token); // TODO: success of loading should be handled
   }
+
+  logOut(){
+    if(this.peopleService.destroySavedUser(this.currentUser)){
+      this.router.navigateByUrl('login');
+    }
+  }
 }
