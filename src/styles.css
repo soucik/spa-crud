@@ -15,6 +15,24 @@ h3, h4{
     text-align: center;
 }
 
+h4{
+    opacity: 0.4;
+    color: antiquewhite;
+}
+
+.form-control{
+    /* background-color: #110b0b; */
+    opacity: 0.6;
+    border-color: #bebebed9;
+    border-color: lightskyblue;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    height: 28px;
+}
+.crossed{
+    text-decoration: underline;
+}
+
 .outer{
     display: table;
     position: absolute;
@@ -32,10 +50,13 @@ h3, h4{
     background-color: rgba(51, 91, 150, 0.80);
     color: white;
     box-shadow: 10px 10px 5px rgba(6, 1, 1, 0.43);
+    height: 600px;
+    overflow: auto;
+    margin: 0;
 }
 
 .innerSide{
-    background-color:rgba(49, 51, 56, 0.80);
+    background-color: #42537ecc;
 }
 
 .table-hover>tbody>tr:hover {

@@ -54,6 +54,8 @@ export class PeopleService {
   createBearerHeader(token): Headers {
     const header = new Headers();
     header.append('Authorization', 'Bearer ' + token);
+    header.append('Content-Type', 'application/json');
+    header.append('accept', 'application/json');
     return header;
   }
 
@@ -68,6 +70,18 @@ export class PeopleService {
 
     let requestOptEditPerson = { headers: this.createBearerHeader(token), body: personToUpdate };
     return this.http.put(this.urlBase + '/api/people/' + id, '', requestOptEditPerson).toPromise()
+      .then(response => { 
+        return response; 
+      })
+      .catch(reject => {
+        return reject;
+      });
+  }
+
+   createPerson(personToCreate: IPerson, token: string): Promise<any> {
+
+    let requestOptEditPerson = { headers: this.createBearerHeader(token), body: personToCreate };
+    return this.http.post(this.urlBase + '/api/people/', '', requestOptEditPerson).toPromise()
       .then(response => { 
         return response; 
       })

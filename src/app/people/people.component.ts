@@ -13,10 +13,12 @@ export class PeopleComponent implements OnInit {
   private currentUser: ICurrentUser;
   private people: IPerson[];
   private selectedPerson: IPerson;
+  @Output() formStatus: String;
 
   constructor(
     private peopleService: PeopleService,
     private router: Router) {
+      this.formStatus = 'closed';
   }
 
   ngOnInit() {
@@ -35,11 +37,28 @@ export class PeopleComponent implements OnInit {
   }
 
   onSelect(person: IPerson): void {
+    this.formStatus = 'closed';
     this.selectedPerson = person;
   }
 
-  childChangedPerson(personIdChanged: number) {
-    this.loadPeople(this.currentUser.token); // TODO: success of loading should be handled
+  creatingPerson(): void {
+    this.formStatus = 'open';
+    this.selectedPerson = {
+      firstName: '',
+      lastName:'',
+      email: ''
+    };
+  }
+
+
+  childChangedPerson(action: String) {
+    this.loadPeople(this.currentUser.token);
+    switch(action){
+      case 'delete':
+        this.selectedPerson = null;
+      break;
+
+    }
   }
 
   logOut(){

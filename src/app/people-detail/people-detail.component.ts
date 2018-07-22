@@ -12,14 +12,14 @@ import { ElementRef, Renderer } from '@angular/core';
 })
 
 export class PeopleDetailComponent implements OnInit, OnChanges {
-
+  @Input() formStatus: String;
   @Input() person: IPerson;
   private personDuplicate: IPerson;
   private updateForm: FormGroup;
   private editStateForm: boolean;
   private notice: INotice;
 
-  @Output() personChanged = new EventEmitter<number>();
+  @Output() personChanged = new EventEmitter<string>();
 
   constructor(private fb: FormBuilder, private peopleService: PeopleService, private router: Router, public el: ElementRef, public renderer: Renderer) {
     // listen for click event on document to hide notice
@@ -52,9 +52,27 @@ export class PeopleDetailComponent implements OnInit, OnChanges {
         .then(response => {
           if(response.status === 200 ){
           this.person = this.personDuplicate;   // dummy way, should resolve after, within method
-          this.personChanged.emit(idPerson);
+          this.personChanged.emit('update');
           this.editStateForm = false;
           this.notice = { text: "Update successful", status: "success"};
+        }
+        else{
+          this.notice = { text: "Something went wrong", status: "error"};
+        }
+        });
+    }
+  }
+
+  onCreatePerson(creatingPerson: IPerson) {
+    let currentUser = this.peopleService.getCurrentUserFromStorage();
+    if (currentUser && currentUser.email != null && currentUser.token != null) {
+      this.peopleService.createPerson(creatingPerson, currentUser.token)
+        .then(response => {
+          if(response.status === 201 ){
+            this.editStateForm = false;
+            this.personChanged.emit('create');
+          this.notice = { text: "Create successful", status: "success"};
+          
         }
         else{
           this.notice = { text: "Something went wrong", status: "error"};
@@ -71,7 +89,9 @@ export class PeopleDetailComponent implements OnInit, OnChanges {
     .then(response => {
        if(response.status === 200){
          this.notice = { text: "Delete successful", status: "success"};
-         this.personChanged.emit(idPerson);
+        //  debugger;
+        //  this.formStatus = "deleted";
+         this.personChanged.emit('delete');
        }
        if(response.status === 403) this.notice = { text: "Forbiden", status: "warning"};
        //...other statuses
