@@ -1,68 +1,128 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, ViewChild, Renderer, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { ICurrentUser, IPerson } from '../common/interfaces';
+import { ICurrentUser, IPerson, INotice, IActionNotice, CommPersonToDetail, CommDetailToPerson } from '../common/interfaces';
 import { PeopleService } from '../services/people.service';
+import { BearerAuthService } from '../services/bearer-auth.service';
 
 @Component({
   selector: 'app-people',
   templateUrl: './people.component.html',
   providers: [PeopleService]
 })
+
 export class PeopleComponent implements OnInit {
-  private currentUser: ICurrentUser;
-  private people: IPerson[];
-  private selectedPerson: IPerson;
-  @Output() formStatus: String;
+  public currentUser: ICurrentUser;
+  public people: IPerson[];
+  public showDetail: boolean;
+  public notice: INotice;
+  public currentPersonId: number;
+  @Output() detailState: IActionNotice;
+  @ViewChild('childPeopleDetail') PeopleDetailComponent;
 
   constructor(
+    private bearerAuthService: BearerAuthService,
     private peopleService: PeopleService,
-    private router: Router) {
-      this.formStatus = 'closed';
+    private router: Router,
+    public renderer: Renderer,
+    private el: ElementRef) {
+    // listen for click event on document to hide notice
+    renderer.listenGlobal('document', 'click', (event) => {
+      this.notice = { text: '', status: '' };
+    });
   }
 
   ngOnInit() {
-    let currentUser = this.peopleService.getCurrentUserFromStorage();
-    if (currentUser && currentUser.email != null && currentUser.token != null) {
+    const currentUser = this.bearerAuthService.getCurrentUserFromStorage();
+    if (currentUser) {
       this.currentUser = currentUser;
-      this.loadPeople(currentUser.token);
-    } else {
-      this.router.navigate(['/login']);
+      this.notice = { text: 'Loading', status: 'warning' };
+      this.loadPeople()
+        .then((actualPeople) => {
+          this.people = actualPeople;
+          this.notice = { text: 'Logged in', status: 'success' };
+        })
+        .catch(error => {
+          this.notice = { text: 'Something went wrong', status: 'error' };
+        });
     }
   }
 
-  loadPeople(token: string): void {
-    let promisedPeople = this.peopleService.getPeopleFromServer(this.currentUser.token);
-    promisedPeople.then(people => this.people = people);
+  loadPeople() {
+    return this.peopleService.getPeopleFromServer(this.currentUser.token);
   }
 
-  onSelect(person: IPerson): void {
-    this.formStatus = 'closed';
-    this.selectedPerson = person;
+  onSelectPerson(person: IPerson) {
+    this.detailState = { action: CommPersonToDetail.select, person: person };
+    this.showDetail = true;
+    this.renderer.setElementStyle(this.el.nativeElement, 'backgroundColor', 'black');
+    this.PeopleDetailComponent.onActionCommand(this.detailState);
+    this.currentPersonId = person.id;
   }
 
-  creatingPerson(): void {
-    this.formStatus = 'open';
-    this.selectedPerson = {
-      firstName: '',
-      lastName:'',
-      email: ''
+  prepareCreatePerson() {
+    this.detailState = {
+      action: CommPersonToDetail.create,
+      person: {
+        firstName: '',
+        lastName: '',
+        email: ''
+      }
     };
+    this.showDetail = !this.showDetail;
+    this.PeopleDetailComponent.onActionCommand(this.detailState);
+    this.currentPersonId = null;
   }
 
-
-  childChangedPerson(action: String) {
-    this.loadPeople(this.currentUser.token);
-    switch(action){
-      case 'delete':
-        this.selectedPerson = null;
-      break;
-
+  detailFinished(commPD: IActionNotice) {
+    switch (commPD.action) {
+      case CommDetailToPerson.close:
+        this.showDetail = false;
+        this.currentPersonId = null;
+        if (commPD.notice && commPD.notice.text && commPD.notice.status) {
+          this.notice = commPD.notice;
+        }
+        break;
+      case CommDetailToPerson.updated:
+        this.loadPeople()
+          .then((actualPeople) => {
+            this.people = actualPeople;
+            this.notice = commPD.notice;
+          })
+          .catch(error => {
+            this.notice = { text: 'Load people error', status: 'error' };
+          });
+        break;
+      case CommDetailToPerson.created:
+        this.loadPeople()
+          .then((actualPeople) => {
+            this.people = actualPeople;
+            this.onSelectPerson(this.people[this.people.length - 1]);
+            this.notice = commPD.notice;
+            this.currentPersonId = this.people[this.people.length - 1].id;
+          })
+          .catch(error => {
+            this.notice = { text: 'Load people error', status: 'error' };
+          });
+        break;
+      case CommDetailToPerson.deleted:
+        if (commPD.notice.status !== 'error') {
+          this.loadPeople()
+            .then((actualPeople) => {
+              this.people = actualPeople;
+              this.currentPersonId = null;
+            })
+            .catch(error => {
+              this.notice = { text: 'Load people error', status: 'error' };
+            });
+          this.showDetail = false;
+        }
+        this.notice = commPD.notice;
+        break;
     }
   }
 
-  logOut(){
-    if(this.peopleService.destroySavedUser(this.currentUser)){
+  logOut() {
+    if (this.bearerAuthService.destroySavedUser(this.currentUser)) {
       this.router.navigateByUrl('login');
     }
   }

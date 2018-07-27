@@ -1,26 +1,55 @@
-/* You can add global styles to this file, and also import other style files */
 @import '~bootstrap/dist/css/bootstrap.min.css';
-
-#base{
-    background: url('assets/images/bgBaranec.jpg') top no-repeat;
+#base {
+    background: url('assets/images/2.jpg') top no-repeat;
 }
 
-body, #base{
+body,
+#base {
     background-size: cover;
     background-attachment: local;
-    background-color: darkgoldenrod;
 }
 
-h3, h4{
+h3,
+h4 {
     text-align: center;
 }
 
-h4{
-    opacity: 0.4;
-    color: antiquewhite;
+h3 span.close {
+    color: white;
+    position: absolute;
+    margin-right: 30px;
+    padding: 5px 8px;
+    right: 5px;
+    cursor: pointer;
+    border-style: solid;
+    border-color: transparent;
+    opacity: 0.6;
 }
 
-.form-control{
+h3 span.close:focus,
+span.close:hover {
+    border: white;
+    border-style: solid;
+    border-radius: 50%;
+    padding: 5px 9px;
+    color: white;
+    opacity: 0.8;
+}
+
+h3 {
+    font-family: monospace;
+    font-weight: bolder;
+    color: #b7b660c4;
+}
+
+h4 {
+    opacity: 0.4;
+    color: antiquewhite;
+    padding: 18px;
+    background-color: #34758a;
+}
+
+.form-control {
     /* background-color: #110b0b; */
     opacity: 0.6;
     border-color: #bebebed9;
@@ -29,65 +58,125 @@ h4{
     padding-bottom: 0px;
     height: 28px;
 }
-.crossed{
-    text-decoration: underline;
-}
 
-.outer{
+.outer {
     display: table;
     position: absolute;
     height: 100%;
     width: 100%;
 }
 
-.middle{
+.middle {
     display: table-cell;
     vertical-align: middle;
 }
 
-.inner{
+.inner {
     background-size: 100%;
-    background-color: rgba(51, 91, 150, 0.80);
-    color: white;
-    box-shadow: 10px 10px 5px rgba(6, 1, 1, 0.43);
-    height: 600px;
-    overflow: auto;
     margin: 0;
 }
 
-.innerSide{
+.innerSide {
+    background-color: rgba(51, 91, 150, 0.80);
+    color: white;
+    box-shadow: 10px 10px 5px rgba(6, 1, 1, 0.43);
+    padding: 25px;
+}
+
+.innerSideleft {
+    height: 600px;
+    overflow: auto;
+    background-size: 100%;
     background-color: #42537ecc;
 }
 
-.table-hover>tbody>tr:hover {
-    background-color:rgba(49, 51, 56, 0.70);
+.panelMenu {
+    background-color: #475362ba;
+    color: white;
+    padding: 10px 25px 10px 30px;
 }
 
-.pointCursor{
+button.btn.btn-warn.header {
+    background-color: #9b9e6380;
+    height: 26px;
+    line-height: 10px;
+    color: ghostwhite;
+}
+
+.btn {
+    opacity: 0.9;
+}
+
+.userName {
+    font-family: monospace;
+    font-size: smaller;
+}
+
+.table-hover>tbody>tr:hover {
+    background-color: #3d5cab6e;
+}
+
+.pointCursor {
     cursor: pointer;
 }
 
-#notice{
-    margin-top: 20px;
-    text-align: center;
-    opacity: 0.9;
-    font-size: 18px;
+.marginedFromTop {
+    margin-top: 10%;
+    background: linear-gradient(#8f8f5e4a, #020202ab, #674b4b85);
+    border-radius: 10%;
+    min-height: 770px;
 }
 
-.success{
+
+/* if middle or inner div change, this should restyle */
+
+@media (max-width: 991px) {
+    .marginedFromTop {
+        min-height: 1230px;
+    }
+}
+
+#notice {
+    /* margin-top: 20px; */
+    text-align: center;
+    opacity: 0.6;
+    font-size: 18px;
+    font-weight: bolder;
+    color: lightyellow;
+    box-shadow: 10px 10px 5px rgba(6, 1, 1, 0.43);
+}
+
+#notice span {
+    overflow-wrap: break-word;
+}
+
+#notice.success {
     background-color: green;
 }
 
-.error{
+#notice.error {
     background-color: red;
 }
 
-.warning{
+#notice.warning {
     background-color: #ff6200ab;
 }
 
-.header{
+.header {
     float: right;
     top: 10px;
     left: 10px;
+}
+
+.highlighted {
+    background-color: #327b8dcc;
+}
+
+label {
+    line-height: 28px;
+}
+
+.form-group label span {
+    padding-left: 12px;
+    display: block;
 }

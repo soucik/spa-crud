@@ -1,8 +1,7 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
-
-import { ICurrentUser, IPerson } from '../common/interfaces';
+import { ICurrentUser, INotice } from '../common/interfaces';
 import { BearerAuthService } from '../services/bearer-auth.service';
 
 @Component({
@@ -11,14 +10,23 @@ import { BearerAuthService } from '../services/bearer-auth.service';
   providers: [BearerAuthService]
 })
 export class LoginComponent {
-  private loginForm: FormGroup;
-  private currentUser: ICurrentUser = { email: '', password: '' };
-  private people: IPerson[];
 
-  constructor(private bearerAuth: BearerAuthService,
+  public loginForm: FormGroup;
+  public currentUser: ICurrentUser = { email: '', password: '' };
+  public notice: INotice = { text: 'No person logged in', status: 'warning' };
+
+  constructor(
+    private bearerAuthService: BearerAuthService,
     private fb: FormBuilder,
     private router: Router) {
-    this.createForm();
+
+    const currentLoggedUser: ICurrentUser = this.bearerAuthService.getCurrentUserFromStorage();
+    if (currentLoggedUser) {
+      this.currentUser = currentLoggedUser;
+      this.router.navigate(['/people']);
+    } else {
+      this.createForm();
+    }
   }
 
   createForm() {
@@ -29,17 +37,18 @@ export class LoginComponent {
   }
 
   onSubmit(currentUser: ICurrentUser) {
-    let promisedToken = this.bearerAuth.getTokenFromServer(currentUser);
-    promisedToken
-      .then((token: string) => {
-        if (token == null) {
-          console.log('something went wrong');
-        } else {
-          this.currentUser = currentUser;
-          this.currentUser.token = token;
-          this.bearerAuth.saveCurrentUserToStorage(this.currentUser);
-          this.router.navigate(['/people']);
-        }
-      });
+    const promisedToken = this.bearerAuthService.getTokenFromServer(currentUser);
+    promisedToken.then((token: string) => {
+      if (token) {
+        this.currentUser = currentUser;
+        this.currentUser.token = token;
+        this.bearerAuthService.saveCurrentUserToStorage(this.currentUser);
+        this.router.navigate(['/people']);
+      } else {
+        this.notice = { text: 'Bad password, name or combination', status: 'error' };
+      }
+    }).catch((error) => {
+      this.notice = { text: error, status: 'error' };
+    });
   }
 }

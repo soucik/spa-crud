@@ -1,40 +1,67 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, SimpleChange, EventEmitter, Output } from '@angular/core';
-import { ReactiveFormsModule, FormGroup, FormBuilder, FormControl, Validators     } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ReactiveFormsModule, FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { BearerAuthService } from '../services/bearer-auth.service';
 
-import { IPerson, INotice } from '../common/interfaces';
+import { IPerson, IActionNotice, CommPersonToDetail, CommDetailToPerson } from '../common/interfaces';
 import { PeopleService } from '../services/people.service';
-import { ElementRef, Renderer } from '@angular/core';
+import { ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-people-detail',
   templateUrl: './people-detail.component.html'
 })
 
-export class PeopleDetailComponent implements OnInit, OnChanges {
-  @Input() formStatus: String;
-  @Input() person: IPerson;
-  private personDuplicate: IPerson;
-  private updateForm: FormGroup;
-  private editStateForm: boolean;
-  private notice: INotice;
+export class PeopleDetailComponent implements OnInit {
 
-  @Output() personChanged = new EventEmitter<string>();
+  public personDuplicate: IPerson;
+  public updateForm: FormGroup;
+  public detailFormEdit: boolean;
+  public isCreateState: boolean;
+  public personDetail: IPerson;
 
-  constructor(private fb: FormBuilder, private peopleService: PeopleService, private router: Router, public el: ElementRef, public renderer: Renderer) {
-    // listen for click event on document to hide notice
-    renderer.listenGlobal('document', 'click', (event) => {
-      if(this.notice && this.notice.text) this.notice.text = "";
-    });
- }
+  @Output() detailFinished = new EventEmitter<any>();
+
+  constructor(
+    private fb: FormBuilder,
+    private peopleService: PeopleService,
+    public el: ElementRef,
+    private bearerAuthService: BearerAuthService) {
+
+    this.detailFormEdit = false;
+  }
 
   ngOnInit() {
     this.createForm();
+    this.personDetail = {
+      firstName: '',
+      lastName: '',
+      email: ''
+    };
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    this.editStateForm = false;
-    this.personDuplicate = Object.assign({}, changes.person.currentValue);
+  closeDetail() {
+    this.detailFinished.emit(<IActionNotice>{ action: CommDetailToPerson.close });
+  }
+
+  onActionCommand(detailState) {
+    switch (detailState.action) {
+
+      case CommPersonToDetail.select:
+        this.detailFormEdit = false;
+        this.isCreateState = false;
+        this.personDetail = Object.assign({}, detailState.person);
+        break;
+
+      case CommPersonToDetail.create:
+        this.detailFormEdit = true;
+        this.isCreateState = true;
+        this.personDetail = detailState.person;
+        break;
+
+      default:
+        console.warn('What should I do?');
+        break;
+    }
   }
 
   createForm() {
@@ -45,60 +72,45 @@ export class PeopleDetailComponent implements OnInit, OnChanges {
     });
   }
 
-  onUpdatePerson(idPerson: number, updatedPerson: IPerson) {
-    let currentUser = this.peopleService.getCurrentUserFromStorage();
-    if (currentUser && currentUser.email != null && currentUser.token != null) {
-      this.peopleService.updatePerson(idPerson, updatedPerson, currentUser.token)
-        .then(response => {
-          if(response.status === 200 ){
-          this.person = this.personDuplicate;   // dummy way, should resolve after, within method
-          this.personChanged.emit('update');
-          this.editStateForm = false;
-          this.notice = { text: "Update successful", status: "success"};
-        }
-        else{
-          this.notice = { text: "Something went wrong", status: "error"};
-        }
-        });
+  onUpdatePerson(updatedPerson: IPerson, idPerson?: number) {
+    const currentUser = this.bearerAuthService.getCurrentUserFromStorage();
+    if (!idPerson) {
+      this.onCreatePerson(updatedPerson);
+      return;
     }
+    this.peopleService.updatePerson(idPerson, updatedPerson, currentUser.token)
+      .then(response => {
+        this.detailFinished.emit(
+          <IActionNotice>{ action: CommDetailToPerson.updated, notice: { text: 'Update successful', status: 'success' } }
+        );
+        this.detailFormEdit = false;
+      }).catch(error => this.detailFinished.emit(
+        <IActionNotice>{ action: CommDetailToPerson.updated, notice: { text: error, status: 'error' } }
+      ));
   }
 
-  onCreatePerson(creatingPerson: IPerson) {
-    let currentUser = this.peopleService.getCurrentUserFromStorage();
-    if (currentUser && currentUser.email != null && currentUser.token != null) {
-      this.peopleService.createPerson(creatingPerson, currentUser.token)
-        .then(response => {
-          if(response.status === 201 ){
-            this.editStateForm = false;
-            this.personChanged.emit('create');
-          this.notice = { text: "Create successful", status: "success"};
-          
-        }
-        else{
-          this.notice = { text: "Something went wrong", status: "error"};
-        }
-        });
-    }
-  }
-
-  deletePerson(idPerson: number){
-    let currentUser = this.peopleService.getCurrentUserFromStorage();
-    if (currentUser && currentUser.email != null && currentUser.token != null) {
-
-    this.peopleService.deletePerson(idPerson, currentUser.token)
-    .then(response => {
-       if(response.status === 200){
-         this.notice = { text: "Delete successful", status: "success"};
-        //  debugger;
-        //  this.formStatus = "deleted";
-         this.personChanged.emit('delete');
-       }
-       if(response.status === 403) this.notice = { text: "Forbiden", status: "warning"};
-       //...other statuses
+  onCreatePerson(personToCreate: IPerson) {
+    const currentUser = this.bearerAuthService.getCurrentUserFromStorage();
+    this.peopleService.createPerson(personToCreate, currentUser.token)
+      .then(response => {
+        this.detailFinished.emit(
+          <IActionNotice>{ action: CommDetailToPerson.created, notice: { text: 'Create successful', status: 'success' } }
+        );
       })
-    .catch(error => {
-       {this.notice = { text: "Something went wrong", status: "error"} };
-    });
+      .catch(error => this.detailFinished.emit(
+        <IActionNotice>{ action: CommDetailToPerson.close, notice: { text: error, status: 'error' } }
+      ));
   }
-}
+
+  onDeletePerson(idPerson: number) {
+    const currentUser = this.bearerAuthService.getCurrentUserFromStorage();
+    this.peopleService.deletePerson(idPerson, currentUser.token)
+      .then(response => {
+        this.detailFinished.emit(
+          <IActionNotice>{ action: CommDetailToPerson.deleted, notice: { text: 'Delete successful', status: 'success' } }
+        );
+      }).catch(error => this.detailFinished.emit(
+        <IActionNotice>{ action: CommDetailToPerson.deleted, notice: { text: error, status: 'error' } }
+      ));
+  }
 }

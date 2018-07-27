@@ -1,28 +1,47 @@
-<div class="col-sm-4 col-xs-12 inner">
-  {{currentUser.email}}
-  <button type="button" class="btn btn-info header" (click)="logOut()">
-    Logout
-  </button>
-  <h3>People</h3>
-  <button type="button" class="btn btn-info header" (click)="creatingPerson()">
-    +
-  </button>
-  <table class="table table-hover" *ngIf="people">
-    <thead>
-      <tr>
-        <th scope="col">First Name</th>
-        <th scope="col">Last Name</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let person of people" [class.selected]="person === selectedPerson" (click)="onSelect(person)" class="pointCursor">
-        <td>{{person.firstName}} </td>
-        <td>{{person.lastName}} </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-<div class="col-sm-8 col-xs-12 inner innerSide" *ngIf="selectedPerson">
-  <app-people-detail [person]="selectedPerson" [formStatus]="formStatus"
-  (personChanged)="childChangedPerson($event)"></app-people-detail>
+<div class="container marginedFromTop">
+  <div class="row">
+    <div class="col-md-offset-1 col-md-4 col-sm-12 panelMenu">
+      <span class="userName">
+        {{currentUser.email}}
+      </span>
+      <button type="button" class="btn btn-warn header" (click)="logOut()">
+        Logout
+      </button>
+    </div>
+    <!-- <div class="col-md-7 col-sm-12 panelMenu">
+      &nbsp;
+      </div> -->
+  </div>
+  <div class="row">
+    <div class="col-md-offset-1 col-md-4 col-sm-12 innerSide innerSideleft">
+      <button type="button" class="btn btn-warning header" (click)="prepareCreatePerson()">
+        +
+      </button>
+      <h3>People</h3> 
+      <table class="table table-hover" *ngIf="people">
+        <thead>
+          <tr>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let person of people" [class.highlighted]="person.id === currentPersonId" [class.selected]="person === selectedPerson"
+            (click)="onSelectPerson(person); selectedHighLight =!selectedHighLight" class="pointCursor">
+            <td>{{person.firstName}} </td>
+            <td>{{person.lastName}} </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-7 col-sm-12 innerSide" [hidden]="!showDetail">
+      <app-people-detail #childPeopleDetail (detailFinished)="detailFinished($event)">
+      </app-people-detail>
+    </div>
+  </div>
+  <div class="row">
+    <div id="notice" class="col-md-offset-1 col-md-4 col-sm-12 {{notice.status}}">
+      <span>{{notice.text}}</span>
+    </div>
+  </div>
 </div>

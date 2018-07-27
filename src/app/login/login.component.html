@@ -1,16 +1,24 @@
-<div class="col-sm-4 col-xs-12 inner">
-  <h3>Want to see records? Log In!</h3>
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)">
-    <div class="form-group">
-      <label class="center-block">Email address
-        <input type="email" class="form-control" id="email" placeholder="Enter email" formControlName="email">
-      </label>
+<div class="container marginedFromTop">
+    <div class="row">
+        <div class="col-sm-offset-1 col-sm-4 col-xs-12 innerSide innerSideleft">        <h3>Want to see records? Log In!</h3>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)">
+          <div class="form-group">
+            <label class="center-block">Email address
+              <input type="email" class="form-control" id="email" placeholder="Enter email" formControlName="email">
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="center-block">Password
+              <input type="password" class="form-control" id="password" placeholder="Password" formControlName="password">
+            </label>
+          </div>
+          <button [disabled]="loginForm.invalid" type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
     </div>
-    <div class="form-group">
-      <label class="center-block">Password
-        <input type="password" class="form-control" id="password" placeholder="Password" formControlName="password">
-      </label>
+    <div class="row">
+      <div id="notice" class="col-sm-offset-1 col-sm-4 col-xs-12 {{notice.status}}">
+        <span>{{notice.text}}</span>
+      </div>
     </div>
-    <button [disabled]="loginForm.invalid" type="submit" class="btn btn-primary">Submit</button>
-  </form>
-</div>
+  </div>
