@@ -1,8 +1,8 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, SimpleChange, EventEmitter, Output } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { BearerAuthService } from '../services/bearer-auth.service';
-
-import { IPerson, IActionNotice, CommPersonToDetail, CommDetailToPerson } from '../common/interfaces';
+import { IPerson, IActionNotice } from '../common/interfaces';
+import { CommPersonToDetail, CommDetailToPerson, TextNotice, StateNotice } from '../common/enums';
 import { PeopleService } from '../services/people.service';
 import { ElementRef } from '@angular/core';
 
@@ -81,11 +81,11 @@ export class PeopleDetailComponent implements OnInit {
     this.peopleService.updatePerson(idPerson, updatedPerson, currentUser.token)
       .then(response => {
         this.detailFinished.emit(
-          <IActionNotice>{ action: CommDetailToPerson.updated, notice: { text: 'Update successful', status: 'success' } }
+          <IActionNotice>{ action: CommDetailToPerson.updated, notice: { text: TextNotice.updateOk, status: StateNotice.success } }
         );
         this.detailFormEdit = false;
       }).catch(error => this.detailFinished.emit(
-        <IActionNotice>{ action: CommDetailToPerson.updated, notice: { text: error, status: 'error' } }
+        <IActionNotice>{ action: CommDetailToPerson.updated, notice: { text: error, status: StateNotice.error } }
       ));
   }
 
@@ -94,11 +94,11 @@ export class PeopleDetailComponent implements OnInit {
     this.peopleService.createPerson(personToCreate, currentUser.token)
       .then(response => {
         this.detailFinished.emit(
-          <IActionNotice>{ action: CommDetailToPerson.created, notice: { text: 'Create successful', status: 'success' } }
+          <IActionNotice>{ action: CommDetailToPerson.created, notice: { text: TextNotice.createOk, status: StateNotice.success } }
         );
       })
       .catch(error => this.detailFinished.emit(
-        <IActionNotice>{ action: CommDetailToPerson.close, notice: { text: error, status: 'error' } }
+        <IActionNotice>{ action: CommDetailToPerson.close, notice: { text: error, status: StateNotice.error } }
       ));
   }
 
@@ -107,10 +107,10 @@ export class PeopleDetailComponent implements OnInit {
     this.peopleService.deletePerson(idPerson, currentUser.token)
       .then(response => {
         this.detailFinished.emit(
-          <IActionNotice>{ action: CommDetailToPerson.deleted, notice: { text: 'Delete successful', status: 'success' } }
+          <IActionNotice>{ action: CommDetailToPerson.deleted, notice: { text: TextNotice.deleteOk, status: StateNotice.success } }
         );
       }).catch(error => this.detailFinished.emit(
-        <IActionNotice>{ action: CommDetailToPerson.deleted, notice: { text: error, status: 'error' } }
+        <IActionNotice>{ action: CommDetailToPerson.deleted, notice: { text: error, status: StateNotice.error } }
       ));
   }
 }

@@ -158,8 +158,12 @@ button.btn.btn-warn.header {
     background-color: red;
 }
 
-#notice.warning {
+#notice.warn {
     background-color: #ff6200ab;
+}
+
+#notice.neutral {
+    background-color: none;
 }
 
 .header {

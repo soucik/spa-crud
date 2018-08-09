@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ICurrentUser, INotice } from '../common/interfaces';
 import { BearerAuthService } from '../services/bearer-auth.service';
+import { TextNotice, StateNotice } from '../common/enums';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +14,7 @@ export class LoginComponent {
 
   public loginForm: FormGroup;
   public currentUser: ICurrentUser = { email: '', password: '' };
-  public notice: INotice = { text: 'No person logged in', status: 'warning' };
+  public notice: INotice = { text: TextNotice.notloggedInState, status: StateNotice.warn };
 
   constructor(
     private bearerAuthService: BearerAuthService,
@@ -45,10 +46,10 @@ export class LoginComponent {
         this.bearerAuthService.saveCurrentUserToStorage(this.currentUser);
         this.router.navigate(['/people']);
       } else {
-        this.notice = { text: 'Bad password, name or combination', status: 'error' };
+        this.notice = { text: TextNotice.wrongPasswordState, status: StateNotice.error };
       }
     }).catch((error) => {
-      this.notice = { text: error, status: 'error' };
+      this.notice = { text: error, status: StateNotice.error };
     });
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, ViewChild, Renderer, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { ICurrentUser, IPerson, INotice, IActionNotice, CommPersonToDetail, CommDetailToPerson } from '../common/interfaces';
+import { ICurrentUser, IPerson, INotice, IActionNotice } from '../common/interfaces';
+import { CommPersonToDetail, CommDetailToPerson, TextNotice, StateNotice } from '../common/enums';
 import { PeopleService } from '../services/people.service';
 import { BearerAuthService } from '../services/bearer-auth.service';
 
@@ -27,7 +28,7 @@ export class PeopleComponent implements OnInit {
     private el: ElementRef) {
     // listen for click event on document to hide notice
     renderer.listenGlobal('document', 'click', (event) => {
-      this.notice = { text: '', status: '' };
+      this.notice = { text: TextNotice.blankState, status: StateNotice.neutral };
     });
   }
 
@@ -35,14 +36,14 @@ export class PeopleComponent implements OnInit {
     const currentUser = this.bearerAuthService.getCurrentUserFromStorage();
     if (currentUser) {
       this.currentUser = currentUser;
-      this.notice = { text: 'Loading', status: 'warning' };
+      this.notice = { text: TextNotice.loadingState, status: StateNotice.warn };
       this.loadPeople()
         .then((actualPeople) => {
           this.people = actualPeople;
-          this.notice = { text: 'Logged in', status: 'success' };
+          this.notice = { text: TextNotice.loggedInState, status: StateNotice.success };
         })
         .catch(error => {
-          this.notice = { text: 'Something went wrong', status: 'error' };
+          this.notice = { text: error, status: StateNotice.error };
         });
     }
   }
@@ -89,7 +90,7 @@ export class PeopleComponent implements OnInit {
             this.notice = commPD.notice;
           })
           .catch(error => {
-            this.notice = { text: 'Load people error', status: 'error' };
+            this.notice = { text: TextNotice.loadError, status: StateNotice.error };
           });
         break;
       case CommDetailToPerson.created:
@@ -101,18 +102,18 @@ export class PeopleComponent implements OnInit {
             this.currentPersonId = this.people[this.people.length - 1].id;
           })
           .catch(error => {
-            this.notice = { text: 'Load people error', status: 'error' };
+            this.notice = { text: TextNotice.loadError, status: StateNotice.error };
           });
         break;
       case CommDetailToPerson.deleted:
-        if (commPD.notice.status !== 'error') {
+        if (commPD.notice.status !== StateNotice.error) {
           this.loadPeople()
             .then((actualPeople) => {
               this.people = actualPeople;
               this.currentPersonId = null;
             })
             .catch(error => {
-              this.notice = { text: 'Load people error', status: 'error' };
+              this.notice = { text: TextNotice.loadError, status: StateNotice.error };
             });
           this.showDetail = false;
         }

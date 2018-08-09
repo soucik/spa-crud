@@ -1,3 +1,5 @@
+import { TextNotice, StateNotice } from './enums';
+
 export interface ICurrentUser {
   email: string;
   password?: string;
@@ -12,21 +14,10 @@ export interface IPerson {
   ownerId?: number;
 }
 
-export enum CommPersonToDetail {
-  create = 'CREATE',
-  select = 'SELECT'
-}
-
-export enum CommDetailToPerson {
-  created = 'CREATED',
-  updated = 'UPDATED',
-  deleted = 'DELETED',
-  close = 'CLOSE'
-}
 
 export interface INotice {
-  text: string;
-  status: string;
+  text: TextNotice;
+  status: StateNotice;
 }
 
 export interface IActionNotice {
