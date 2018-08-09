@@ -4,6 +4,7 @@
       <span class="userName">
         {{currentUser.email}}
       </span>
+      <h3>People</h3>
       <button type="button" class="btn btn-warn header" (click)="logOut()">
         Logout
       </button>
@@ -17,7 +18,7 @@
       <button type="button" class="btn btn-warning header" (click)="prepareCreatePerson()">
         +
       </button>
-      <h3>People</h3> 
+
       <table class="table table-hover" *ngIf="people">
         <thead>
           <tr>
